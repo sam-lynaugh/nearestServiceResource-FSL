@@ -1,6 +1,5 @@
-public with sharing class nearestServiceResourceController {
-    @AuraEnabled( cacheable = true )  
-
+public class nearestServiceResourceController {
+    @AuraEnabled (cacheable = true)
     public static List<ServiceResource> fetchServiceResources(String serviceAppointmentId) {
         ServiceAppointment sa = [SELECT Id, FSL__InternalSLRGeolocation__c FROM ServiceAppointment WHERE Id = :serviceAppointmentId LIMIT 1];
         Location loc = sa.FSL__InternalSLRGeolocation__c;
@@ -16,6 +15,7 @@ public with sharing class nearestServiceResourceController {
         Set<Id> srIdSet = closestResources.keySet();*/
     }
 
+    @AuraEnabled (cacheable = false)
     public static ServiceAppointment scheduleAppointment(String serviceAppointmentId, String serviceResourceId) {
         ServiceAppointment sa = [SELECT Id, FSL__InternalSLRGeolocation__c, ParentRecordId, Subject FROM ServiceAppointment WHERE Id = :serviceAppointmentId LIMIT 1];
         
@@ -28,11 +28,13 @@ public with sharing class nearestServiceResourceController {
             DueDate = dueDate
         );
 
-        ServiceResourcePreference newSrp = new ServiceResourcePreference(
+        /*ServiceResourcePreference newSrp = new ServiceResourcePreference(
             ServiceResourceId = serviceResourceId,
-            
-        );
+
+        );*/
 
         insert newSa;
+
+        return newSa;
     }
 }

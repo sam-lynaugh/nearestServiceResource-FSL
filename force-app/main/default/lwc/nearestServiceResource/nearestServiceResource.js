@@ -40,7 +40,10 @@ export default class NearestServiceResource extends LightningElement {
         const actionName = event.detail.action.name;  
         if ( actionName === 'Book' ) {  
             //Create WO, SA, and book selected service resource (recId)
-            
+            scheduleAppointment( {serviceAppointmentId: this.recordId}, {serviceResourceId: recId} )
+            .then((result)=>{console.log(JSON.stringify(result));
+            })
+            .catch((error)=>{console.log(error);})
         }         
     }
 
