@@ -1,6 +1,8 @@
 import { LightningElement, api, wire, track} from 'lwc';
 import fetchServiceResources from '@salesforce/apex/NearestServiceResourceController.fetchServiceResources';
 import scheduleAppointment from '@salesforce/apex/NearestServiceResourceController.scheduleAppointment';
+import { NavigationMixin } from 'lightning/navigation';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 const COLUMNS = [  
     { label: 'Name', fieldName: 'Name' },
@@ -16,7 +18,7 @@ const COLUMNS = [
     } }
 ];
 
-export default class NearestServiceResource extends LightningElement {
+export default class NearestServiceResource extends NavigationMixin(LightningElement) {
 
     @api recordId;
     @track columns = COLUMNS;
@@ -41,29 +43,28 @@ export default class NearestServiceResource extends LightningElement {
         if ( actionName === 'Book' ) {  
             //Create WO, SA, and book selected service resource (recId)
             scheduleAppointment( {serviceAppointmentId: this.recordId}, {serviceResourceId: recId} )
-            .then((result)=>{console.log(JSON.stringify(result));
+            .then((result)=>{
+                this[NavigationMixin.GenerateUrl]({
+                    type: 'standard__recordPage',
+                    attributes: {
+                        recordId: result.Id,
+                        actionName: 'view',
+                    },
+                }).then((url) => {
+                    const event = new ShowToastEvent({
+                        title: 'Success!',
+                        message: 'New Service Appointment created! See it {0}!',
+                        messageData: [
+                            {
+                                url,
+                                label: 'here',
+                            },
+                        ],
+                    });
+                    this.dispatchEvent(event);
+                });
             })
             .catch((error)=>{console.log(error);})
         }         
     }
-
-    /*connectedCallback() {
-        //fetch today's todos from server
-        this.fetchResources();
-    }*/
-
-    //Fetch 5 closest service resources from server
-    /*fetchResources() {
-        fetchServiceResources(this.recordId)
-        .then(result => {
-            if (result) {
-            //update todos property with result
-            this.serviceResources = result;
-            console.log(this.serviceResources);
-            }
-        })
-        .catch(error => {
-            console.error("Error in fetching services resources: " + error);
-        });
-    }*/
 }
