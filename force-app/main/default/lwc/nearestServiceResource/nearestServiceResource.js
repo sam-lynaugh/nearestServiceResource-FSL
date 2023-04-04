@@ -42,7 +42,7 @@ export default class NearestServiceResource extends NavigationMixin(LightningEle
         const actionName = event.detail.action.name;  
         if ( actionName === 'Book' ) {  
             //Create WO, SA, and book selected service resource (recId)
-            scheduleAppointment( {serviceAppointmentId: this.recordId}, {serviceResourceId: recId} )
+            scheduleAppointment({ serviceAppointmentId: this.recordId, serviceResourceId: event.detail.row.Id })
             .then((result)=>{
                 this[NavigationMixin.GenerateUrl]({
                     type: 'standard__recordPage',
@@ -64,7 +64,16 @@ export default class NearestServiceResource extends NavigationMixin(LightningEle
                     this.dispatchEvent(event);
                 });
             })
-            .catch((error)=>{console.log(error);})
+            .catch((error)=>{
+                console.log(error);
+                const evt = new ShowToastEvent({
+                    title: 'Toast Error',
+                    message: 'Some unexpected error -- Please contact your system admin',
+                    variant: 'error',
+                    mode: 'dismissable'
+                });
+                this.dispatchEvent(evt);
+            })
         }         
     }
 }
