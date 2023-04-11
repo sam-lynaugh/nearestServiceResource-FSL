@@ -53,7 +53,7 @@ export default class NearestServiceResource extends NavigationMixin(LightningEle
                 }).then((url) => {
                     const event = new ShowToastEvent({
                         title: 'Success!',
-                        message: 'New Service Appointment created! See it {0}!',
+                        message: 'New Appointment created! Schedule it {0}!',
                         messageData: [
                             {
                                 url,
